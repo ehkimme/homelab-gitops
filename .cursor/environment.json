@@ -1,0 +1,16 @@
+{
+  "name": "homelab-gitops",
+  "user": "ubuntu",
+  "build": {
+    "dockerfile": "Dockerfile"
+  },
+  "install": "bash .cursor/install.sh",
+  "start": "bash .cursor/start.sh",
+  "terminals": [
+    {
+      "name": "vaultwarden-port-forward",
+      "command": "KUBECONFIG=$HOME/.kube/config kubectl -n vaultwarden port-forward --address 0.0.0.0 svc/vaultwarden 8081:80"
+    }
+  ],
+  "ports": [8081]
+}

@@ -18,9 +18,6 @@ The service application pool to create or reuse.
 .PARAMETER ServiceApplicationName
 The Subscription Settings service application to create or reuse.
 
-.PARAMETER ProxyName
-The service application proxy to create or reuse.
-
 .PARAMETER DatabaseName
 The Subscription Settings database name.
 
@@ -52,9 +49,6 @@ param(
 
     [ValidateNotNullOrEmpty()]
     [string]$ServiceApplicationName = 'Subscription Settings Service Application',
-
-    [ValidateNotNullOrEmpty()]
-    [string]$ProxyName = 'Subscription Settings Service Application Proxy',
 
     [Parameter(Mandatory)]
     [ValidateNotNullOrEmpty()]
@@ -152,24 +146,19 @@ if (-not $serviceApplication -and $applicationPool) {
 }
 
 $proxy = Get-SPServiceApplicationProxy |
-    Where-Object { $_.Name -eq $ProxyName } |
+    Where-Object {
+        $_.TypeName -eq 'Microsoft SharePoint Foundation Subscription Settings Service Application Proxy'
+    } |
     Select-Object -First 1
-
-if ($proxy -and
-    $proxy.TypeName -ne 'Microsoft SharePoint Foundation Subscription Settings Service Application Proxy') {
-    throw "A different service application proxy named '$ProxyName' already exists."
-}
 
 if (-not $proxy -and $serviceApplication) {
     if ($PSCmdlet.ShouldProcess(
-            $ProxyName,
-            'Create Subscription Settings service application proxy in the default proxy group'
+            $ServiceApplicationName,
+            'Create Subscription Settings service application proxy'
         )) {
-        Write-Verbose "Creating service application proxy '$ProxyName'."
+        Write-Verbose "Creating a proxy for '$ServiceApplicationName'."
         $proxy = New-SPSubscriptionSettingsServiceApplicationProxy `
-            -Name $ProxyName `
-            -ServiceApplication $serviceApplication `
-            -DefaultProxyGroup
+            -ServiceApplication $serviceApplication
     }
 }
 
@@ -178,7 +167,7 @@ if (-not $proxy -and $serviceApplication) {
     ServiceInstanceStatus  = $serviceInstance.Status
     ApplicationPool        = if ($applicationPool) { $applicationPool.Name } else { $ApplicationPoolName }
     ServiceApplication     = if ($serviceApplication) { $serviceApplication.Name } else { $ServiceApplicationName }
-    Proxy                  = if ($proxy) { $proxy.Name } else { $ProxyName }
+    Proxy                  = if ($proxy) { $proxy.Name } else { '(not created)' }
     Database               = $DatabaseName
     DatabaseServer         = if ($DatabaseServer) { $DatabaseServer } else { '(farm default)' }
 }

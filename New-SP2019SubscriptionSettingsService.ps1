@@ -6,8 +6,8 @@ Creates a SharePoint Server 2019 Subscription Settings service application.
 Run this script in the SharePoint Management Shell as a farm administrator on
 the SharePoint application server that should host the service instance.
 
-The script is idempotent: it reuses an existing service application pool,
-service application, and proxy when their configured names already exist.
+The script is idempotent: it reuses an existing service application pool and
+service application by name, and the farm's existing Subscription Settings proxy.
 
 .PARAMETER ManagedAccount
 The registered SharePoint managed account used by the service application pool.
